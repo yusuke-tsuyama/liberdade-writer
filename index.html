@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TSUYU｜「細かすぎる」エンタメ研究所</title>
+<meta name="description" content="おもしろくてタメになる知的エンタメ記事を執筆します。映画・マンガ・ドラマ・数字を細かく観察するライター TSUYU。Quick Japan Web、ねとらぼ、マグミクスに寄稿。">
+<meta property="og:title" content="TSUYU｜「細かすぎる」エンタメ研究所">
+<meta property="og:description" content="おもしろくてタメになる知的エンタメ記事を執筆します。">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #faf8f4;
+    --ink: #22201d;
+    --muted: #6b665e;
+    --line: #e3ded4;
+    --accent: #b4442b;
+    --accent-ink: #ffffff;
+    --card: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b1a18;
+      --ink: #efebe3;
+      --muted: #a39d92;
+      --line: #35322d;
+      --accent: #e0765c;
+      --accent-ink: #1b1a18;
+      --card: #24221f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    line-height: 1.95;
+    font-size: 17px;
+    -webkit-text-size-adjust: 100%;
+  }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+  .narrow { max-width: 720px; }
+  .sans { font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif; }
+
+  /* ヘッダー(ロゴ+ナビ) */
+  header.site {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  header.site .wrap {
+    display: flex; justify-content: space-between; align-items: center;
+    min-height: 56px; gap: 12px;
+  }
+  .brand { font-weight: 700; letter-spacing: .03em; color: var(--ink); text-decoration: none; line-height: 1.3; }
+  .brand small { display: block; font-weight: 400; font-size: 11px; color: var(--muted); letter-spacing: .08em; }
+  nav.global { display: flex; gap: 20px; align-items: center; }
+  nav.global a { color: var(--muted); text-decoration: none; }
+  nav.global a:hover { color: var(--accent); }
+  nav.global a.nav-cta {
+    color: var(--accent-ink); background: var(--accent);
+    padding: 6px 16px; border-radius: 999px;
+  }
+  nav.global a.nav-cta:hover { color: var(--accent-ink); opacity: .85; }
+  .menu-btn {
+    display: none; width: 44px; height: 44px; margin-right: -10px;
+    background: none; border: 0; cursor: pointer; padding: 0;
+    align-items: center; justify-content: center;
+  }
+  .menu-btn span, .menu-btn span::before, .menu-btn span::after {
+    display: block; width: 22px; height: 2px; background: var(--ink);
+    position: relative; transition: transform .2s, background .2s;
+  }
+  .menu-btn span::before, .menu-btn span::after { content: ""; position: absolute; left: 0; }
+  .menu-btn span::before { top: -7px; }
+  .menu-btn span::after { top: 7px; }
+  .menu-btn[aria-expanded="true"] span { background: transparent; }
+  .menu-btn[aria-expanded="true"] span::before { transform: translateY(7px) rotate(45deg); }
+  .menu-btn[aria-expanded="true"] span::after { transform: translateY(-7px) rotate(-45deg); }
+
+  @media (max-width: 680px) {
+    .js .menu-btn { display: inline-flex; }
+    .js nav.global {
+      display: none; position: absolute; left: 0; right: 0; top: 100%;
+      flex-direction: column; align-items: stretch; gap: 0;
+      background: var(--bg); border-bottom: 1px solid var(--line);
+      padding: 4px 20px 16px;
+    }
+    .js nav.global.open { display: flex; }
+    .js nav.global a { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 16px; }
+    .js nav.global a.nav-cta { margin-top: 14px; text-align: center; border-bottom: 0; padding: 12px; }
+    .no-js nav.global { gap: 12px; flex-wrap: wrap; }
+    .no-js header.site .wrap { flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
+  }
+
+  /* ファーストビュー */
+  .hero { padding-top: 48px; padding-bottom: 28px; }
+  .hero-grid { display: grid; gap: 32px; align-items: center; grid-template-columns: 1.35fr 1fr; }
+  .hero-grid.no-photo { grid-template-columns: 1fr; }
+  .hero .target { font-size: 13px; color: var(--muted); letter-spacing: .04em; margin: 22px 0 0; line-height: 1.7; }
+  .hero .target + .cta { margin-top: 10px; }
+  .about-photo { margin: 0 0 24px; max-width: 220px; }
+  .about-photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+  .hero h1 {
+    font-size: clamp(28px, 5.4vw, 42px);
+    line-height: 1.5; margin: 0 0 20px; letter-spacing: .02em;
+  }
+  .hero h1 em { font-style: normal; background: linear-gradient(transparent 68%, color-mix(in srgb, var(--accent) 28%, transparent) 68%); }
+  .hero .sub { margin: 0 0 8px; color: var(--muted); font-size: 16px; line-height: 1.85; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+  .btn {
+    display: inline-block; padding: 12px 26px;
+    border: 1px solid var(--accent); border-radius: 999px;
+    text-decoration: none; font-size: 15px; font-weight: 700; text-align: center;
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { opacity: .85; }
+  .btn.ghost:hover { background: var(--accent); color: var(--accent-ink); }
+  .hero figure { margin: 0; }
+  .hero figure img {
+    display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover;
+    object-position: 50% 0;
+    border-radius: 14px; border: 1px solid var(--line);
+  }
+  .nb { display: inline-block; }
+  .hero h1 { text-wrap: balance; }
+  .hero .sub, .hero .target { text-wrap: pretty; }
+  .hero figcaption { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; }
+  @media (max-width: 760px) {
+    .hero { padding-top: 32px; }
+    .hero figure { margin: 0 auto 0 0; }
+    .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero figure { max-width: 300px; }
+    .cta .btn { flex: 1 1 100%; }
+  }
+
+  .scroll-cue { display: flex; justify-content: center; padding: 8px 0 28px; }
+  .scroll-cue a {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-size: 11px; letter-spacing: .24em; color: var(--muted); text-decoration: none;
+  }
+  .scroll-cue a::after {
+    content: ""; width: 1px; height: 28px; background: var(--muted);
+    transform-origin: top; animation: cue 1.8s ease-in-out infinite;
+  }
+  @keyframes cue { 0% { transform: scaleY(0); } 60% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .scroll-cue a::after { animation: none; } html { scroll-behavior: auto; } }
+
+  /* 本文 */
+  section { padding: 44px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 22px; margin: 0 0 22px; letter-spacing: .04em; }
+  h2::before {
+    content: ""; display: inline-block; width: 22px; height: 3px;
+    background: var(--accent); vertical-align: middle; margin-right: 12px;
+  }
+  p { margin: 0 0 1.4em; }
+  p:last-child { margin-bottom: 0; }
+
+  ul.values { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  ul.values li { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+  ul.values strong { display: block; }
+  ul.values span { color: var(--muted); font-size: 15px; }
+
+  .theme-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .theme { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .theme b { display: block; margin-bottom: 4px; }
+  .theme span { color: var(--muted); font-size: 15px; }
+
+  .works { list-style: none; margin: 0; padding: 0; }
+  .works li { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .works li:first-child { padding-top: 0; }
+  .works .where { font-size: 13px; color: var(--muted); letter-spacing: .06em; }
+  .works .what { display: block; margin-top: 2px; }
+
+  /* 実績(リンクカード) */
+  h3.group { font-size: 16px; margin: 40px 0 16px; letter-spacing: .06em; }
+  h3.group:first-of-type { margin-top: 28px; }
+  .lead-note { color: var(--muted); font-size: 15px; margin: 0; }
+  .proof-grid { display: grid; gap: 28px 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .proof-grid.one { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 680px) { .proof-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+  .work { margin: 0; display: flex; flex-direction: column; min-width: 0; }
+
+  /* 大きな数字 */
+  .stat {
+    margin: 0; display: flex; align-items: baseline; gap: 8px;
+    padding: 14px 22px 10px; border-radius: 12px 12px 0 0;
+    background: var(--c); color: #fff; line-height: 1; font-weight: 800;
+  }
+  .stat .lbl { font-size: 15px; letter-spacing: .04em; opacity: .95; }
+  .stat .num { font-size: clamp(54px, 13vw, 72px); font-weight: 900; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .stat .unit { font-size: clamp(22px, 5vw, 28px); }
+
+  /* リンクカード(URLから自動で中身を取得して表示) */
+  .lcx {
+    display: flex; gap: 16px; align-items: flex-start; min-height: 120px;
+    padding: 16px 18px; border: 1px solid var(--line); background: var(--card);
+    color: var(--ink); text-decoration: none; border-radius: 12px;
+    font-size: 15px; line-height: 1.55; font-weight: 700;
+    transition: box-shadow .15s, border-color .15s, opacity .2s;
+  }
+  .lcx:hover { box-shadow: 0 6px 18px rgba(0,0,0,.14); border-color: var(--accent); }
+  .lcx.is-loading { opacity: .6; }
+  .work .lcx:not(.solo) { flex: 1; border-top: 0; border-radius: 0 0 12px 12px; }
+  .lcx-main { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; gap: 6px; }
+  .lcx-title {
+    font-size: 16px; line-height: 1.5; font-weight: 700;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .lcx-desc {
+    font-size: 12.5px; line-height: 1.65; font-weight: 400; color: var(--muted);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .lcx-like { font-size: 13px; font-weight: 400; color: #d6336c; }
+  .lcx-foot {
+    margin-top: auto; padding-top: 4px; display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 400; color: var(--muted); min-width: 0;
+  }
+  .lcx-foot span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .lcx-foot .lcx-date { flex: none; overflow: visible; text-overflow: clip; }
+  .lcx-ava { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex: none; background: var(--line); }
+  .lcx-fav { width: 16px; height: 16px; object-fit: contain; flex: none; }
+  .lcx-thumb {
+    flex: none; width: 168px; aspect-ratio: 1.91 / 1; object-fit: cover;
+    border-radius: 6px; background: var(--line);
+  }
+  @media (max-width: 680px) {
+    .lcx { gap: 12px; padding: 14px; }
+    .lcx-thumb { width: 104px; }
+    .lcx-title { font-size: 15px; }
+  }
+
+  .foot-note { color: var(--muted); font-size: 12.5px; margin: 18px 0 0; line-height: 1.7; }
+  .authors { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 22px 0 0; padding: 0; list-style: none; font-size: 13px; }
+  .authors li a {
+    display: inline-block; padding: 4px 12px; border: 1px solid var(--line);
+    border-radius: 999px; color: var(--muted); text-decoration: none; background: var(--card);
+  }
+  .authors li a:hover { color: var(--accent); border-color: var(--accent); }
+  .authors-label { width: 100%; font-size: 12.5px; color: var(--muted); }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0 48px; color: var(--muted); font-size: 13px; }
+</style>
+<script>
+  document.documentElement.classList.add('js');
+</script>
+</head>
+<body>
+
+<header class="site sans">
+  <div class="wrap">
+    <a class="brand" href="#top">「細かすぎる」エンタメ研究所<small>所長 TSUYU</small></a>
+    <button class="menu-btn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="gnav"><span></span></button>
+    <nav class="global" id="gnav" aria-label="メインメニュー">
+      <a href="#works">実績</a>
+      <a href="#about">プロフィール</a>
+      <a href="#themes">書くこと</a>
+      <a class="nav-cta" href="#contact">執筆のご依頼</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <div class="wrap hero">
+    <div class="hero-grid">
+      <div>
+        <h1><em>おもしろくてタメになる</em><br><span class="nb">知的エンタメ記事を</span><span class="nb">執筆します。</span></h1>
+        <p class="sub">映画・マンガ・ドラマ・数字を、細かく観察して書きます。</p>
+        <p class="sub">Quick Japan Web・ねとらぼ・マグミクスに寄稿し、ヤフコメ275件を集めた記事もあります。</p>
+        <p class="target sans">執筆のご依頼は、編集者・Web担当者の方からお受けします。</p>
+        <div class="cta sans">
+          <a class="btn primary" href="#contact">執筆を相談する</a>
+          <a class="btn ghost" href="https://note.com/lapromenade1208" target="_blank" rel="noopener">noteで記事を読む</a>
+        </div>
+      </div>
+      <figure>
+        <img src="images/illustration.webp" alt="ノートPCで原稿を書くライター TSUYU のイラスト" width="800" height="1200" onerror="this.closest('.hero-grid').classList.add('no-photo');this.closest('figure').hidden=true;">
+        <figcaption class="sans">ライター TSUYU(津山雄輔)</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="scroll-cue sans"><a href="#works" aria-label="実績へスクロール">SCROLL</a></div>
+
+  <div class="wrap">
+
+    <section id="works">
+      <h2>実績</h2>
+      <p class="lead-note sans">商業媒体では、旧名義「ツヤマユウスケ」で執筆しています。</p>
+
+      <!--
+        リンクカードの足し方:
+        <a class="lcx sans" data-linkcard href="記事のURL" target="_blank" rel="noopener">JSが動かないときに出る代わりの文字</a>
+        と書くだけで、リンク先のタイトル・説明・サムネイルが自動で表示されます。
+        説明文を自分で決めたいときは data-desc="..." を足します。
+        取得できるのは、netlify/functions/ogp.mjs の許可リストにあるサイトだけです。
+      -->
+
+      <h3 class="group sans">商業媒体で書いた記事</h3>
+      <div class="proof-grid">
+        <article class="work" style="--c:#1d7f3a">
+          <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">275</span><span class="unit">件</span></p>
+          <a class="lcx sans" data-linkcard href="https://qjweb.jp/column/53714/" target="_blank" rel="noopener">『サマーウォーズ』汗だくのラスト8分間を考察。なぜ健二は小惑星探査機の直撃を阻止できたのか？</a>
+        </article>
+        <article class="work" style="--c:#13284f">
+          <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">209</span><span class="unit">件</span></p>
+          <a class="lcx sans" data-linkcard href="https://qjweb.jp/column/64441/" target="_blank" rel="noopener">考察『紅の豚』ポルコはなぜ秘密警察に命を狙われているのか？</a>
+        </article>
+        <article class="work" style="--c:#d1101c">
+          <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">169</span><span class="unit">件</span></p>
+          <a class="lcx sans" data-linkcard href="https://nlab.itmedia.co.jp/cont/articles/3353624/" target="_blank" rel="noopener">映画「シン・仮面ライダー」レビュー ライダーに変身したくない本郷猛と、エヴァに乗りたくない碇シンジ</a>
+        </article>
+        <article class="work" style="--c:#dd6a00">
+          <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">105</span><span class="unit">件</span></p>
+          <a class="lcx sans" data-linkcard href="https://magmix.jp/post/135038" target="_blank" rel="noopener">『閃光のハサウェイ』の宇宙作戦は『エヴァ』を超えるか？ 注目の「空中受領」シーン</a>
+        </article>
+      </div>
+      <p class="foot-note sans">ヤフコメの件数は、Yahoo!ニュースに転載された当時の数です。リンク先は、掲載元サイトの記事です。</p>
+      <ul class="authors sans">
+        <li class="authors-label">掲載媒体の著者ページ</li>
+        <li><a href="https://qjweb.jp/contributor/53720/" target="_blank" rel="noopener">Quick Japan Web</a></li>
+        <li><a href="https://nlab.itmedia.co.jp/authors/%E3%83%84%E3%83%A4%E3%83%9E%E3%83%A6%E3%82%A6%E3%82%B9%E3%82%B1/" target="_blank" rel="noopener">ねとらぼ</a></li>
+        <li><a href="https://magmix.jp/post/writer/tsuyama" target="_blank" rel="noopener">マグミクス(1)</a></li>
+        <li><a href="https://magmix.jp/post/writer/komakasugi" target="_blank" rel="noopener">マグミクス(2)</a></li>
+      </ul>
+
+      <h3 class="group sans">noteで書いたマガジン</h3>
+      <div class="proof-grid">
+        <article class="work" style="--c:#dd6a00">
+          <p class="stat sans"><span class="lbl">note累計</span><span class="num">600</span><span class="unit">スキ突破</span></p>
+          <a class="lcx sans" data-linkcard href="https://note.com/lapromenade1208/m/mbd97780cfb0c" target="_blank" rel="noopener">虚構と現実の交差点――エンタメから読み解く社会とニュース</a>
+        </article>
+        <article class="work" style="--c:#744630">
+          <p class="stat sans"><span class="lbl">note累計</span><span class="num">900</span><span class="unit">スキ突破</span></p>
+          <a class="lcx sans" data-linkcard href="https://note.com/lapromenade1208/m/m875c9f2a6ad9" target="_blank" rel="noopener">御社の決算書を見せてください｜ブラック企業を回避する会計戦略</a>
+        </article>
+      </div>
+      <p style="margin-top:22px;"><a class="btn ghost sans" href="https://note.com/lapromenade1208" target="_blank" rel="noopener">noteの記事をすべて読む</a></p>
+
+      <h3 class="group sans">取材記事</h3>
+      <div class="proof-grid one">
+        <article class="work">
+          <a class="lcx solo sans" data-linkcard data-title="DOF magazine" data-desc="プロカメラマン伴貞良氏主宰「オンラインサロン・虎の穴」のフォトメディアに寄稿しています。若い職人の取材記事や、有名建築の探訪記が主な内容です。" href="https://www.dofmgzn.com/?author=5" target="_blank" rel="noopener">DOF magazine</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="narrow">
+        <h2>プロフィール</h2>
+        <figure class="about-photo">
+          <img src="images/profile.jpg" alt="ライター TSUYU(津山雄輔)の顔写真" width="640" height="800" loading="lazy" onerror="this.closest('figure').hidden=true;">
+        </figure>
+        <p>TSUYU(津山雄輔)です。</p>
+        <p>「細かすぎる」エンタメ研究所の所長として、作品の細部を観察し、そこから社会や数字へ話をつなげる文章を書いています。</p>
+        <p>めざしているのは、おもしろくてタメになる「知的エンタメ」です。</p>
+        <p>現在は、noteでエッセイと連載小説を書いています。</p>
+        <p>ライターとは別に、合同会社リベルダードの代表として、AIを組み込んだWebアプリの開発も手がけています。</p>
+      </div>
+    </section>
+
+    <section id="values">
+      <div class="narrow">
+        <h2>書くときの3つの姿勢</h2>
+        <ul class="values">
+          <li><strong>物語を、細かく見る</strong><span>細かすぎるほど観察して、見過ごされてきた違いを拾います。</span></li>
+          <li><strong>遠くまでつなぐ</strong><span>作品の話を、社会や数字の話にまでつなげます。</span></li>
+          <li><strong>楽しく届ける</strong><span>読み終えたとき、おもしろくて、少しタメになる文章にします。</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="themes">
+      <h2>書くこと</h2>
+      <div class="theme-grid">
+        <div class="theme"><b>映画</b><span>監督や俳優の作品を、通して観て読み解きます。</span></div>
+        <div class="theme"><b>マンガ</b><span>人気作を、構成や描写の細部から読みます。</span></div>
+        <div class="theme"><b>ドラマ</b><span>脚本や演出の工夫を、細かく拾います。</span></div>
+        <div class="theme"><b>働き方</b><span>壊れた働き方を、再設計する視点で書きます。</span></div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="narrow">
+        <h2>執筆のご依頼</h2>
+        <p>執筆のご依頼は、媒体や分野を問わず、まずはご相談ください。</p>
+        <p>内容とご予算をうかがったうえで、お引き受けできるかをお返事します。</p>
+        <p><a class="btn primary sans" href="https://liberdade-consultant.netlify.app/" target="_blank" rel="noopener">合同会社リベルダードのサイトで連絡先を見る</a></p>
+        <!-- TODO: 連絡用のメールアドレスまたはフォームに差し替える -->
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap sans">© 2026 TSUYU(津山雄輔)</div>
+</footer>
+
+<script>
+  (function () {
+    var btn = document.querySelector('.menu-btn');
+    var nav = document.getElementById('gnav');
+    if (!btn || !nav) return;
+    function setOpen(open) {
+      nav.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+    }
+    btn.addEventListener('click', function () { setOpen(!nav.classList.contains('open')); });
+    nav.addEventListener('click', function (e) { if (e.target.tagName === 'A') setOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+  })();
+</script>
+<script>
+  /* リンクカード: <a class="lcx" data-linkcard href="URL"> を、リンク先の内容つきのカードに置き換える */
+  (function () {
+    var API = '/api/ogp?url=';
+    var cards = [].slice.call(document.querySelectorAll('a.lcx[data-linkcard]'));
+    if (!cards.length || !window.fetch) return;
+
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+    function isHttp(u) { return /^https?:\/\//i.test(u || ''); }
+    function img(cls, src) {
+      var i = el('img', cls);
+      i.alt = ''; i.loading = 'lazy'; i.referrerPolicy = 'no-referrer'; i.src = src;
+      i.addEventListener('error', function () { i.remove(); });
+      return i;
+    }
+    function fmtDate(iso) {
+      try {
+        var d = new Date(iso); if (isNaN(d)) return '';
+        var p = {};
+        new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+          .formatToParts(d).forEach(function (x) { p[x.type] = x.value; });
+        return p.year + '/' + p.month + '/' + p.day + ' ' + p.hour + ':' + p.minute;
+      } catch (e) { return ''; }
+    }
+    function cacheGet(k) { try { var v = sessionStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+    function cacheSet(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 使えなくても問題なし */ } }
+
+    // 取得した内容でカードを組み立てる(文字は textContent で入れるので、取得した内容が画面を壊すことはない)
+    function build(a, d, fallbackTitle) {
+      var title = a.getAttribute('data-title') || d.title || fallbackTitle;
+      var desc = a.getAttribute('data-desc') || d.description || '';
+      var main = el('span', 'lcx-main');
+      main.appendChild(el('strong', 'lcx-title', title));
+      if (desc) main.appendChild(el('span', 'lcx-desc', desc));
+      if (isFinite(d.likeCount) && d.likeCount !== null) main.appendChild(el('span', 'lcx-like', '♥ ' + d.likeCount));
+
+      var foot = el('span', 'lcx-foot');
+      var host = d.host || (function () { try { return new URL(a.href).hostname; } catch (e) { return ''; } })();
+      if (d.authorName) {
+        if (isHttp(d.authorIcon)) foot.appendChild(img('lcx-ava', d.authorIcon));
+        foot.appendChild(el('span', '', d.authorName));
+        var dt = fmtDate(d.publishedAt);
+        if (dt) foot.appendChild(el('span', 'lcx-date', dt));
+      } else {
+        if (isHttp(d.favicon)) foot.appendChild(img('lcx-fav', d.favicon));
+        foot.appendChild(el('span', '', d.siteName ? d.siteName + ' | ' + host : host));
+      }
+      main.appendChild(foot);
+
+      a.textContent = '';
+      a.appendChild(main);
+      if (isHttp(d.image)) a.appendChild(img('lcx-thumb', d.image));
+    }
+
+    cards.forEach(function (a) {
+      var url = a.href;
+      var fallbackTitle = a.textContent.trim() || url;
+      var key = 'lcx:' + url;
+      var cached = cacheGet(key);
+      if (cached) { build(a, cached, fallbackTitle); return; }
+
+      a.classList.add('is-loading');
+      var ctrl = window.AbortController ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 10000) : null;
+      fetch(API + encodeURIComponent(url), ctrl ? { signal: ctrl.signal } : {})
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (d) { cacheSet(key, d); build(a, d, fallbackTitle); })
+        .catch(function () { build(a, {}, fallbackTitle); }) // 取得できないときは、タイトルとドメインだけの通常のカード
+        .then(function () { a.classList.remove('is-loading'); if (timer) clearTimeout(timer); });
+    });
+  })();
+</script>
+</body>
+</html>
