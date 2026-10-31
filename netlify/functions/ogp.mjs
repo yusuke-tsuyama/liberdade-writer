@@ -20,7 +20,9 @@ const ALLOW_HOSTS = (process.env.LINKCARD_ALLOW
 ).map((s) => s.trim().toLowerCase()).filter(Boolean);
 
 const UA = "Mozilla/5.0 (compatible; LinkCardBot/1.0)";
-const MAX_BYTES = 800 * 1024;
+const MAX_BYTES = 1200 * 1024;      // これ以上は読まない
+const SEARCH_BYTES = 600 * 1024;    // <head> に情報がないとき、本文をここまで探す
+const AFTER_EMBED_BYTES = 24 * 1024; // 埋め込みデータを見つけたあと、続けて読む量
 const MAX_REDIRECTS = 4;
 const TIMEOUT_MS = 8000;
 
@@ -59,37 +61,96 @@ function attrs(tag) {
   return out;
 }
 
-export function parseHtml(html, baseUrl) {
-  const head = html.slice(0, MAX_BYTES);
+// 普通の <meta> タグ
+function htmlMeta(html) {
   const meta = {};
-  for (const m of head.matchAll(/<meta\b[^>]*>/gi)) {
+  for (const m of html.matchAll(/<meta\b[^>]*>/gi)) {
     const a = attrs(m[0]);
     const key = (a.property || a.name || "").toLowerCase();
     if (key && a.content !== undefined && !(key in meta)) meta[key] = decodeEntities(a.content).trim();
   }
-  const titleTag = head.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return meta;
+}
+
+// Next.js(noteなど)は、<meta> の内容を、script の中に
+//   {\"property\":\"og:image\",\"content\":\"https://...\"}
+// のようなエスケープされた形で入れている。それを取り出す。
+function collectJsonMeta(s, out) {
+  const re = /\{"(?:property|name)":"([^"]+)","content":"((?:[^"\\]|\\[\s\S])*)"\}/g;
+  for (const m of s.matchAll(re)) {
+    const k = m[1].toLowerCase();
+    if (k in out) continue;
+    try { out[k] = JSON.parse('"' + m[2] + '"').trim(); } catch { out[k] = m[2]; }
+  }
+}
+export function embeddedMeta(text) {
+  const out = {};
+  const pushRe = /self\.__next_f\.push\(\[\d+,"((?:[^"\\]|\\[\s\S])*)"\]\)/g;
+  for (const p of text.matchAll(pushRe)) {
+    let chunk;
+    try { chunk = JSON.parse('"' + p[1] + '"'); } catch { continue; }
+    collectJsonMeta(chunk, out);
+  }
+  if (!Object.keys(out).length) collectJsonMeta(text.replace(/\\"/g, '"'), out); // 取りこぼし対策
+  return out;
+}
+
+// og:image が無いページ用: 本文中の、最初の記事写真らしい画像を探す
+const NOT_CONTENT_IMG = /logo|icon|avatar|emoji|gravatar|sprite|spacer|pixel|blank|loading|banner|header|footer|button|1x1/i;
+export function firstContentImage(html, baseUrl) {
+  for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
+    const a = attrs(m[0]);
+    const cand = [a["data-src"], a["data-lazy-src"], a["data-original"], (a.srcset || a["data-srcset"] || "").split(",")[0]?.trim().split(/\s+/)[0], a.src];
+    const raw = cand.find((v) => v && !/^data:/i.test(v));
+    if (!raw) continue;
+    let abs;
+    try { abs = new URL(decodeEntities(raw), baseUrl).href; } catch { continue; }
+    if (!/\.(jpe?g|png|webp|avif)(\?|#|$)/i.test(abs)) continue;
+    if (NOT_CONTENT_IMG.test(abs) || NOT_CONTENT_IMG.test(a.class || "") || NOT_CONTENT_IMG.test(a.alt || "")) continue;
+    const w = parseInt(a.width, 10), h = parseInt(a.height, 10);
+    if ((w && w < 120) || (h && h < 80)) continue;
+    return abs;
+  }
+  return "";
+}
+
+export function parseHtml(html, baseUrl) {
+  const meta = { ...embeddedMeta(html), ...htmlMeta(html) }; // 普通の<meta>を優先
+  const titleTag = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const abs = (v) => {
     if (!v) return "";
     try { return new URL(decodeEntities(v), baseUrl).href; } catch { return ""; }
   };
 
-  let favicon = "";
-  for (const m of head.matchAll(/<link\b[^>]*>/gi)) {
+  let favicon = "", touch = "";
+  for (const m of html.matchAll(/<link\b[^>]*>/gi)) {
     const a = attrs(m[0]);
     const rel = (a.rel || "").toLowerCase();
-    if (/(^|\s)(icon|shortcut icon|apple-touch-icon)(\s|$)/.test(rel) && a.href) {
-      favicon = abs(a.href);
-      if (!/apple-touch-icon/.test(rel)) break;
-    }
+    if (!a.href) continue;
+    if (/apple-touch-icon/.test(rel)) { if (!touch) touch = abs(a.href); }
+    else if (/(^|\s)(icon|shortcut icon)(\s|$)/.test(rel) && !favicon) favicon = abs(a.href);
   }
-  if (!favicon) favicon = abs("/favicon.ico");
+  if (!favicon) favicon = touch || abs("/favicon.ico");
+
+  // サムネイル: og:image → twitter:image → 本文の最初の記事写真 → サイトのアイコン
+  let image = abs(meta["og:image"] || meta["twitter:image"] || meta["twitter:image:src"]);
+  let imageSource = image ? "meta" : "";
+  if (!image) {
+    image = firstContentImage(html, baseUrl);
+    if (image) imageSource = "content";
+  }
+  if (!image) {
+    image = touch || abs(meta["msapplication-tileimage"]);
+    if (image) imageSource = "icon";
+  }
 
   const siteName = meta["og:site_name"] || "";
   const rawTitle = meta["og:title"] || meta["twitter:title"] || (titleTag ? decodeEntities(titleTag[1]).trim() : "");
   return {
     title: cleanTitle(rawTitle, siteName),
     description: (meta["og:description"] || meta["twitter:description"] || meta["description"] || "").replace(/\s+/g, " ").trim(),
-    image: abs(meta["og:image"] || meta["twitter:image"] || meta["twitter:image:src"]),
+    image,
+    imageSource,
     siteName,
     favicon,
   };
@@ -135,24 +196,40 @@ async function fetchWithGuard(startUrl, init = {}) {
   throw new HttpError(502, "リダイレクトが多すぎます");
 }
 
-async function readLimited(res, limit) {
+// 必要な分だけ読む:
+//  ・<head> に og:image / og:title があれば、そこで止める(ふつうのサイト)
+//  ・無ければ、本文を探す。埋め込みデータ(noteなど)が見つかったら、少し先まで読んで止める
+async function readSmart(res) {
   const reader = res.body?.getReader?.();
-  if (!reader) return new Uint8Array(await res.arrayBuffer()).slice(0, limit);
-  let acc = Buffer.alloc(0);
-  while (acc.length < limit) {
+  if (!reader) return Buffer.from(await res.arrayBuffer()).subarray(0, MAX_BYTES);
+  const chunks = [];
+  let total = 0, text = "", scanFrom = 0, embedAt = -1;
+  while (total < MAX_BYTES) {
     const { done, value } = await reader.read();
     if (done) break;
-    acc = Buffer.concat([acc, value]);
-    // <head> を読み終えたら、残りは取らない
-    if (acc.toString("latin1").toLowerCase().includes("</head>")) break;
+    chunks.push(Buffer.from(value));
+    total += value.length;
+    text += Buffer.from(value).toString("latin1");
+
+    const headEnd = text.search(/<\/head>/i);
+    if (headEnd >= 0 && /(?:property|name)\s*=\s*["'](?:og:image|og:title|twitter:image)["']/i.test(text.slice(0, headEnd))) break;
+    if (embedAt < 0) {
+      const re = /og:(?:image|title)/g;
+      re.lastIndex = Math.max(0, scanFrom - 8);
+      const m = re.exec(text);
+      if (m) embedAt = m.index;
+      scanFrom = text.length;
+    }
+    if (embedAt >= 0 && text.length > embedAt + AFTER_EMBED_BYTES) break;
+    if (headEnd >= 0 && embedAt < 0 && total >= SEARCH_BYTES) break;
   }
   try { await reader.cancel(); } catch { /* noop */ }
-  return acc.subarray(0, limit);
+  return Buffer.concat(chunks).subarray(0, MAX_BYTES);
 }
 
 function decodeBody(bytes, contentType) {
   const sniff = Buffer.from(bytes.subarray(0, 4096)).toString("latin1");
-  let label =
+  const label =
     (/charset\s*=\s*["']?([\w-]+)/i.exec(contentType || "") || [])[1] ||
     (/<meta[^>]+charset\s*=\s*["']?([\w-]+)/i.exec(sniff) || [])[1] ||
     "utf-8";
@@ -163,7 +240,7 @@ function decodeBody(bytes, contentType) {
   }
 }
 
-/* ---------- noteだけの追加情報(スキ数・著者・日付)。取れなければ無視 ---------- */
+/* ---------- noteの記事だけの追加情報(スキ数・著者・日付・題名)。取れなければ無視 ---------- */
 
 async function noteExtras(url) {
   const m = /^\/[^/]+\/n\/([A-Za-z0-9]+)\/?$/.exec(url.pathname);
@@ -178,6 +255,7 @@ async function noteExtras(url) {
     if (!d) return {};
     const u = d.user || {};
     return {
+      noteTitle: String(d.name ?? ""),
       likeCount: Number(d.likeCount ?? d.like_count ?? NaN),
       authorName: String(u.nickname ?? u.name ?? ""),
       authorIcon: String(u.userProfileImagePath ?? u.user_profile_image_path ?? ""),
@@ -212,10 +290,11 @@ export default async (req) => {
   try {
     const { res, url: finalUrl } = await fetchWithGuard(url, { headers: { accept: "text/html,application/xhtml+xml" } });
     if (!res.ok) return json({ error: `取得に失敗しました(${res.status})` }, 502);
-    const bytes = await readLimited(res, MAX_BYTES);
+    const bytes = await readSmart(res);
     const html = decodeBody(bytes, res.headers.get("content-type"));
     const info = parseHtml(html, finalUrl.href);
-    const extras = await noteExtras(finalUrl);
+    const { noteTitle, ...extras } = await noteExtras(finalUrl);
+    if (noteTitle) info.title = noteTitle;
 
     return json(
       { url: finalUrl.href, host: finalUrl.hostname, ...info, ...extras },
