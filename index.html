@@ -183,17 +183,22 @@
   .proof-grid { display: grid; gap: 28px 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .proof-grid.one { grid-template-columns: minmax(0, 1fr); }
   @media (max-width: 680px) { .proof-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
-  .work { margin: 0; display: flex; flex-direction: column; min-width: 0; }
+  .work { margin: 0; display: flex; flex-direction: column; min-width: 0; container-type: inline-size; }
 
-  /* 大きな数字 */
+  /* 大きな数字(色は本ページの基調色 rgb(180,68,43) に統一。カード幅に合わせて文字が縮む) */
   .stat {
-    margin: 0; display: flex; align-items: baseline; gap: 8px;
-    padding: 14px 22px 10px; border-radius: 12px 12px 0 0;
-    background: var(--c); color: #fff; line-height: 1; font-weight: 800;
+    margin: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline;
+    gap: 0 10px; padding: 16px 14px 12px; border-radius: 12px 12px 0 0;
+    background: #b4442b; color: #fff; line-height: 1.15; font-weight: 800; text-align: center;
   }
-  .stat .lbl { font-size: 15px; letter-spacing: .04em; opacity: .95; }
-  .stat .num { font-size: clamp(54px, 13vw, 72px); font-weight: 900; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-  .stat .unit { font-size: clamp(22px, 5vw, 28px); }
+  .stat .lbl, .stat .unit {
+    font-size: 28px; font-size: clamp(17px, 6.6cqw, 28px); /* ← 「ヤフコメ」「note累計」「件」「スキ突破」の大きさ(最大28px) */
+    letter-spacing: .04em; white-space: nowrap;
+  }
+  .stat .num {
+    font-size: 52px; font-size: clamp(36px, 12cqw, 52px); /* ← 数字の大きさ(最大52px) */
+    font-weight: 800; letter-spacing: -.01em; font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
 
   /* リンクカード(URLから自動で中身を取得して表示) */
   .lcx {
@@ -244,7 +249,31 @@
   .authors li a:hover { color: var(--accent); border-color: var(--accent); }
   .authors-label { width: 100%; font-size: 12.5px; color: var(--muted); }
 
+  /* お問い合わせフォーム */
+  .cform { display: grid; gap: 20px; margin-top: 8px; }
+  .cform .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; margin: 0; }
+  .cform label { font-weight: 700; font-size: 15px; }
+  .cform .field label { display: block; margin-bottom: 6px; }
+  .cform .req { margin-left: 8px; padding: 1px 7px; border-radius: 4px; background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 700; vertical-align: 1px; }
+  .cform input[type="text"], .cform input[type="email"], .cform textarea {
+    width: 100%; font: inherit; font-size: 16px; line-height: 1.6; padding: 12px 14px;
+    color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .cform textarea { resize: vertical; min-height: 160px; }
+  .cform input:focus-visible, .cform textarea:focus-visible, .cform button:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 1px; border-color: var(--accent); }
+  .cform .agree label { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; line-height: 1.7; cursor: pointer; }
+  .cform .agree input { width: 20px; height: 20px; margin: 3px 0 0; flex: none; accent-color: var(--accent); }
+  .cform .submit { margin: 0; }
+  .cform .btn { width: 100%; cursor: pointer; font-family: inherit; }
+  .cform .btn:disabled { opacity: .6; cursor: wait; }
+  .form-msg { margin: 0; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--accent); font-size: 14px; line-height: 1.7; }
+  .form-done { padding: 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+  .form-done p { margin: 8px 0 0; }
+  @media (min-width: 681px) { .cform .btn { width: auto; min-width: 260px; } }
+
   footer { border-top: 1px solid var(--line); padding: 28px 0 48px; color: var(--muted); font-size: 13px; }
+  .foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; }
+  footer a { color: var(--muted); }
 </style>
 <script>
   document.documentElement.classList.add('js');
@@ -259,7 +288,6 @@
     <nav class="global" id="gnav" aria-label="メインメニュー">
       <a href="#works">実績</a>
       <a href="#about">プロフィール</a>
-      <a href="#themes">書くこと</a>
       <a class="nav-cta" href="#contact">執筆のご依頼</a>
     </nav>
   </div>
@@ -271,8 +299,8 @@
     <div class="hero-grid">
       <div>
         <h1><em>おもしろくてタメになる</em><br><span class="nb">知的エンタメ記事を</span><span class="nb">執筆します。</span></h1>
-        <p class="sub">映画・マンガ・ドラマ・数字を、細かく観察して書きます。</p>
-        <p class="sub">Quick Japan Web・ねとらぼ・マグミクスに寄稿し、ヤフコメ275件を集めた記事もあります。</p>
+        <p class="sub">映画・マンガ・ドラマなどの作品を、現実世界の社会と結びつけながら考察した記事を書いています。</p>
+        <p class="sub">Quick Japan Web・ねとらぼ・マグミクスに寄稿。Yahoo!ニュースに転載され、275件のコメントがついた記事もあります。</p>
         <p class="target sans">執筆のご依頼は、編集者・Web担当者の方からお受けします。</p>
         <div class="cta sans">
           <a class="btn primary" href="#contact">執筆を相談する</a>
@@ -281,7 +309,7 @@
       </div>
       <figure>
         <img src="images/illustration.webp" alt="ノートPCで原稿を書くライター TSUYU のイラスト" width="800" height="1200" onerror="this.closest('.hero-grid').classList.add('no-photo');this.closest('figure').hidden=true;">
-        <figcaption class="sans">ライター TSUYU(津山雄輔)</figcaption>
+        <figcaption class="sans">ライター 津山雄輔（TSUYU）</figcaption>
       </figure>
     </div>
   </div>
@@ -292,7 +320,7 @@
 
     <section id="works">
       <h2>実績</h2>
-      <p class="lead-note sans">商業媒体では、旧名義「ツヤマユウスケ」で執筆しています。</p>
+      <p class="lead-note sans">商業媒体では「TSUYU」や「ツヤマユウスケ」名義で執筆しています。</p>
 
       <!--
         リンクカードの足し方:
@@ -303,26 +331,26 @@
         取得できるのは、netlify/functions/ogp.mjs の許可リストにあるサイトだけです。
       -->
 
-      <h3 class="group sans">商業媒体で書いた記事</h3>
+      <h3 class="group sans">商業媒体での主な読者反応</h3>
       <div class="proof-grid">
-        <article class="work" style="--c:#1d7f3a">
+        <article class="work">
           <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">275</span><span class="unit">件</span></p>
           <a class="lcx sans" data-linkcard href="https://qjweb.jp/column/53714/" target="_blank" rel="noopener">『サマーウォーズ』汗だくのラスト8分間を考察。なぜ健二は小惑星探査機の直撃を阻止できたのか？</a>
         </article>
-        <article class="work" style="--c:#13284f">
+        <article class="work">
           <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">209</span><span class="unit">件</span></p>
           <a class="lcx sans" data-linkcard href="https://qjweb.jp/column/64441/" target="_blank" rel="noopener">考察『紅の豚』ポルコはなぜ秘密警察に命を狙われているのか？</a>
         </article>
-        <article class="work" style="--c:#d1101c">
+        <article class="work">
           <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">169</span><span class="unit">件</span></p>
           <a class="lcx sans" data-linkcard href="https://nlab.itmedia.co.jp/cont/articles/3353624/" target="_blank" rel="noopener">映画「シン・仮面ライダー」レビュー ライダーに変身したくない本郷猛と、エヴァに乗りたくない碇シンジ</a>
         </article>
-        <article class="work" style="--c:#dd6a00">
+        <article class="work">
           <p class="stat sans"><span class="lbl">ヤフコメ</span><span class="num">105</span><span class="unit">件</span></p>
           <a class="lcx sans" data-linkcard href="https://magmix.jp/post/135038" target="_blank" rel="noopener">『閃光のハサウェイ』の宇宙作戦は『エヴァ』を超えるか？ 注目の「空中受領」シーン</a>
         </article>
       </div>
-      <p class="foot-note sans">ヤフコメの件数は、Yahoo!ニュースに転載された当時の数です。リンク先は、掲載元サイトの記事です。</p>
+      <p class="foot-note sans">各コメントの件数は、Yahoo!ニュースに転載された当時の数です。リンク先は、掲載元サイトの記事です。</p>
       <ul class="authors sans">
         <li class="authors-label">掲載媒体の著者ページ</li>
         <li><a href="https://qjweb.jp/contributor/53720/" target="_blank" rel="noopener">Quick Japan Web</a></li>
@@ -333,11 +361,11 @@
 
       <h3 class="group sans">noteで書いたマガジン</h3>
       <div class="proof-grid">
-        <article class="work" style="--c:#dd6a00">
+        <article class="work">
           <p class="stat sans"><span class="lbl">note累計</span><span class="num">600</span><span class="unit">スキ突破</span></p>
           <a class="lcx sans" data-linkcard data-title="虚構と現実の交差点――エンタメから読み解く社会とニュース" href="https://note.com/lapromenade1208/m/mbd97780cfb0c" target="_blank" rel="noopener">虚構と現実の交差点――エンタメから読み解く社会とニュース</a>
         </article>
-        <article class="work" style="--c:#744630">
+        <article class="work">
           <p class="stat sans"><span class="lbl">note累計</span><span class="num">900</span><span class="unit">スキ突破</span></p>
           <a class="lcx sans" data-linkcard data-title="御社の決算書を見せてください｜ブラック企業を回避する会計戦略" href="https://note.com/lapromenade1208/m/m875c9f2a6ad9" target="_blank" rel="noopener">御社の決算書を見せてください｜ブラック企業を回避する会計戦略</a>
         </article>
@@ -356,13 +384,13 @@
       <div class="narrow">
         <h2>プロフィール</h2>
         <figure class="about-photo">
-          <img src="images/profile.jpg" alt="ライター TSUYU(津山雄輔)の顔写真" width="640" height="800" loading="lazy" onerror="this.closest('figure').hidden=true;">
+          <img src="images/profile.jpg" alt="ライター 津山雄輔（TSUYU）の顔写真" width="640" height="800" loading="lazy" onerror="this.closest('figure').hidden=true;">
         </figure>
-        <p>TSUYU(津山雄輔)です。</p>
+        <p>フリーライターの津山雄輔（TSUYU）と申します。</p>
         <p>「細かすぎる」エンタメ研究所の所長として、作品の細部を観察し、そこから社会や数字へ話をつなげる文章を書いています。</p>
-        <p>めざしているのは、おもしろくてタメになる「知的エンタメ」です。</p>
-        <p>現在は、noteでエッセイと連載小説を書いています。</p>
-        <p>ライターとは別に、合同会社リベルダードの代表として、AIを組み込んだWebアプリの開発も手がけています。</p>
+        <p>こよなく愛するエンターテイメント作品の知識に加え、「経理の実務経験」や「IT技術を駆使した業務改善経験」をかけ合わせた執筆をしてきました。</p>
+        <p>めざしているのは、おもしろくてタメになる「おもタメ」記事です。</p> 
+        <p>なお、ライター業とは別に、合同会社リベルダードの代表として、AIを組み込んだWebアプリの開発も手がけています。</p>
       </div>
     </section>
 
@@ -370,30 +398,48 @@
       <div class="narrow">
         <h2>書くときの3つの姿勢</h2>
         <ul class="values">
-          <li><strong>物語を、細かく見る</strong><span>細かすぎるほど観察して、見過ごされてきた違いを拾います。</span></li>
-          <li><strong>遠くまでつなぐ</strong><span>作品の話を、社会や数字の話にまでつなげます。</span></li>
-          <li><strong>楽しく届ける</strong><span>読み終えたとき、おもしろくて、少しタメになる文章にします。</span></li>
+          <li><strong>物語を細かく見る</strong><span>細かすぎるほど観察して、見過ごされてきた違いを拾います。</span></li>
+          <li><strong>遠くまでつなぐ</strong><span>作品の話を、現実社会やニュースの話にまでつなげます。</span></li>
+          <li><strong>楽しく届ける</strong><span>読み終えたとき、おもしろくて、タメになったと思える文章にします。</span></li>
         </ul>
-      </div>
-    </section>
-
-    <section id="themes">
-      <h2>書くこと</h2>
-      <div class="theme-grid">
-        <div class="theme"><b>映画</b><span>監督や俳優の作品を、通して観て読み解きます。</span></div>
-        <div class="theme"><b>マンガ</b><span>人気作を、構成や描写の細部から読みます。</span></div>
-        <div class="theme"><b>ドラマ</b><span>脚本や演出の工夫を、細かく拾います。</span></div>
-        <div class="theme"><b>働き方</b><span>壊れた働き方を、再設計する視点で書きます。</span></div>
       </div>
     </section>
 
     <section id="contact">
       <div class="narrow">
         <h2>執筆のご依頼</h2>
-        <p>執筆のご依頼は、媒体や分野を問わず、まずはご相談ください。</p>
-        <p>内容とご予算をうかがったうえで、お引き受けできるかをお返事します。</p>
-        <p><a class="btn primary sans" href="https://liberdade-consultant.netlify.app/" target="_blank" rel="noopener">合同会社リベルダードのサイトで連絡先を見る</a></p>
-        <!-- TODO: 連絡用のメールアドレスまたはフォームに差し替える -->
+        <p>執筆のご依頼は、媒体や分野を問わず、まずはご相談ください。下のフォームからお送りください。</p>
+
+        <form class="cform sans" name="contact" method="POST" action="thanks.html" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="contact">
+          <p class="hp" aria-hidden="true"><label>入力しないでください <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+
+          <div class="field">
+            <label for="f-name">お名前<span class="req">必須</span></label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="f-kana">フリガナ<span class="req">必須</span></label>
+            <input id="f-kana" name="kana" type="text" autocomplete="off" placeholder="例:ツヤマ ユウスケ" pattern="[ァ-ヶー・ 　]+" title="カタカナで入力してください" required>
+          </div>
+          <div class="field">
+            <label for="f-org">会社名・組織名<span class="req">必須</span></label>
+            <input id="f-org" name="organization" type="text" autocomplete="organization" required>
+          </div>
+          <div class="field">
+            <label for="f-mail">メールアドレス<span class="req">必須</span></label>
+            <input id="f-mail" name="email" type="email" autocomplete="email" inputmode="email" required>
+          </div>
+          <div class="field">
+            <label for="f-body">お問い合わせ内容<span class="req">必須</span></label>
+            <textarea id="f-body" name="message" rows="7" required placeholder="媒体名、ご依頼の内容、ご希望の納期などをご記入ください。"></textarea>
+          </div>
+          <div class="agree">
+            <label><input type="checkbox" name="privacy" value="同意する" required><span><a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意します。</span></label>
+          </div>
+          <p class="form-msg" role="alert" hidden></p>
+          <p class="submit"><button class="btn primary" type="submit">この内容で送信する</button></p>
+        </form>
       </div>
     </section>
 
@@ -401,7 +447,7 @@
 </main>
 
 <footer>
-  <div class="wrap sans">© 2026 TSUYU(津山雄輔)</div>
+  <div class="wrap sans foot-row"><span>© 2026 津山雄輔（TSUYU）</span><a href="privacy.html">プライバシーポリシー</a></div>
 </footer>
 
 <script>
@@ -494,6 +540,38 @@
         .then(function (d) { cacheSet(key, d); build(a, d, fallbackTitle); })
         .catch(function () { build(a, {}, fallbackTitle); }) // 取得できないときは、タイトルとドメインだけの通常のカード
         .then(function () { a.classList.remove('is-loading'); if (timer) clearTimeout(timer); });
+    });
+  })();
+</script>
+<script>
+  /* お問い合わせフォーム: ページを移動せずに送信(JSが使えない場合は thanks.html へ移動する通常の送信) */
+  (function () {
+    var f = document.querySelector('form.cform');
+    if (!f || !window.fetch) return;
+    var kana = f.elements['kana'], btn = f.querySelector('button[type=submit]'), msg = f.querySelector('.form-msg');
+    function toKana() { kana.value = kana.value.replace(/[ぁ-ゖ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); }); }
+    kana.addEventListener('change', toKana);
+    kana.addEventListener('blur', toKana);
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      toKana();
+      btn.disabled = true; btn.textContent = '送信中…'; msg.hidden = true;
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(f)).toString()
+      }).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        var done = document.createElement('div');
+        done.className = 'form-done sans'; done.tabIndex = -1;
+        var h = document.createElement('strong'); h.textContent = '送信しました。';
+        var p = document.createElement('p'); p.textContent = 'お問い合わせありがとうございます。内容を確認のうえ、ご入力いただいたメールアドレスへご連絡します。';
+        done.appendChild(h); done.appendChild(p);
+        f.replaceWith(done); done.focus();
+      }).catch(function () {
+        msg.textContent = '送信に失敗しました。時間をおいて、もう一度お試しください。解決しない場合は info@liberdade.sakura.ne.jp までメールでご連絡ください。';
+        msg.hidden = false; btn.disabled = false; btn.textContent = 'この内容で送信する';
+      });
     });
   })();
 </script>
