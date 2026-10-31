@@ -228,6 +228,7 @@
     flex: none; width: 168px; aspect-ratio: 1.91 / 1; object-fit: cover;
     border-radius: 6px; background: var(--line);
   }
+  .lcx-thumb.logo { object-fit: contain; background: #fff; padding: 10px; }
   @media (max-width: 680px) {
     .lcx { gap: 12px; padding: 14px; }
     .lcx-thumb { width: 104px; }
@@ -297,6 +298,7 @@
         リンクカードの足し方:
         <a class="lcx sans" data-linkcard href="記事のURL" target="_blank" rel="noopener">JSが動かないときに出る代わりの文字</a>
         と書くだけで、リンク先のタイトル・説明・サムネイルが自動で表示されます。
+        画像を自分で指定したいときは data-image="画像のURL"、題名は data-title、
         説明文を自分で決めたいときは data-desc="..." を足します。
         取得できるのは、netlify/functions/ogp.mjs の許可リストにあるサイトだけです。
       -->
@@ -333,11 +335,11 @@
       <div class="proof-grid">
         <article class="work" style="--c:#dd6a00">
           <p class="stat sans"><span class="lbl">note累計</span><span class="num">600</span><span class="unit">スキ突破</span></p>
-          <a class="lcx sans" data-linkcard href="https://note.com/lapromenade1208/m/mbd97780cfb0c" target="_blank" rel="noopener">虚構と現実の交差点――エンタメから読み解く社会とニュース</a>
+          <a class="lcx sans" data-linkcard data-title="虚構と現実の交差点――エンタメから読み解く社会とニュース" href="https://note.com/lapromenade1208/m/mbd97780cfb0c" target="_blank" rel="noopener">虚構と現実の交差点――エンタメから読み解く社会とニュース</a>
         </article>
         <article class="work" style="--c:#744630">
           <p class="stat sans"><span class="lbl">note累計</span><span class="num">900</span><span class="unit">スキ突破</span></p>
-          <a class="lcx sans" data-linkcard href="https://note.com/lapromenade1208/m/m875c9f2a6ad9" target="_blank" rel="noopener">御社の決算書を見せてください｜ブラック企業を回避する会計戦略</a>
+          <a class="lcx sans" data-linkcard data-title="御社の決算書を見せてください｜ブラック企業を回避する会計戦略" href="https://note.com/lapromenade1208/m/m875c9f2a6ad9" target="_blank" rel="noopener">御社の決算書を見せてください｜ブラック企業を回避する会計戦略</a>
         </article>
       </div>
       <p style="margin-top:22px;"><a class="btn ghost sans" href="https://note.com/lapromenade1208" target="_blank" rel="noopener">noteの記事をすべて読む</a></p>
@@ -473,7 +475,8 @@
 
       a.textContent = '';
       a.appendChild(main);
-      if (isHttp(d.image)) a.appendChild(img('lcx-thumb', d.image));
+      var pic = a.getAttribute('data-image') || d.image;
+      if (isHttp(pic)) a.appendChild(img('lcx-thumb' + (!a.getAttribute('data-image') && d.imageSource === 'icon' ? ' logo' : ''), pic));
     }
 
     cards.forEach(function (a) {
